@@ -169,12 +169,6 @@
 
 * Typescript
 #+BEGIN_SRC elisp
-   (use-package typescript-mode
-     :straight t)
-   (use-package web-mode
-     :straight t)
-   (use-package json-mode
-     :straight t)
    (add-to-list 'auto-mode-alist '("\\.tsx?\\'" . tsx-ts-mode))
 #+END_SRC
 
@@ -204,8 +198,6 @@
 
 * Flycheck
 #+BEGIN_SRC elisp
-  (use-package flycheck
-    :straight t)
 #+END_SRC
 
 * Projectile
