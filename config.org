@@ -39,7 +39,7 @@
   (use-package doom-themes
     :straight t
     :ensure t)
-  (load-theme 'ef-light t)
+  (load-theme 'ef-duo-light t)
   (add-to-list 'load-path "~/.emacs.d/nano-emacs/")
 #+END_SRC
 
@@ -59,7 +59,8 @@
 #+BEGIN_SRC elisp
   (use-package mood-line
     :straight t
-    :ensure t)
+    :ensure t
+    :init (mood-line-mode 1))
 #+END_SRC
 
 * Vertico
@@ -127,7 +128,7 @@
   (require 'eglot)
   (fset #'jsonrpc--log-event #'ignore)
   (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
-  (add-hook 'java-ts-mode-hook 'eglot-ensure)
+;;  (add-hook 'java-ts-mode-hook 'eglot-ensure)
   (set-default 'indent-tabs-mode nil)
   (use-package apheleia
     :straight t)
@@ -172,6 +173,11 @@
    (add-to-list 'auto-mode-alist '("\\.tsx?\\'" . tsx-ts-mode))
 #+END_SRC
 
+* Java
+#+BEGIN_SRC elisp
+  (add-to-list 'auto-mode-alist '("\\.java?\\'" . java-ts-mode))
+#+END_SRC
+
 * Flymake eslint
 #+BEGIN_SRC elisp
   (use-package flymake-eslint
@@ -183,7 +189,10 @@
 
 * Treesitter
 #+BEGIN_SRC elisp
-  (require 'treesit)
+  (use-package treesit
+  :ensure nil
+  :custom
+  (treesit-font-lock-level 4))
   (require 'ansi-color)
   (defun colorize-compilation-buffer ()
     (ansi-color-apply-on-region compilation-filter-start (point-max)))
@@ -192,12 +201,36 @@
 
 * Dape
 #+BEGIN_SRC elisp
-  (use-package dape
-    :straight t)
+    ;;  (use-package dape
+      ;;  :straight t)
+
+    ;;(add-to-list 'load-path "~/.emacs.d/dape")
+  ;;  (require 'dape)
+    (use-package dape
+    :straight (dape :type git :host github :repo "svaante/dape"
+                        :fork (:host github
+                               :repo "MagielBruntink/dape")))
+    (require 'eglot)
+  (add-hook 'java-ts-mode-hook 'eglot-ensure)
+    (add-to-list 'eglot-server-programs
+               `((java-mode java-ts-mode) .
+                 ("jdtls"
+                  :initializationOptions
+                  (:bundles ["/home/ap/.emacs.d/jdtls/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-0.50.0.jar"]))))
 #+END_SRC
 
-* Flycheck
+* Yasnippet
 #+BEGIN_SRC elisp
+  (use-package yasnippet
+    :straight t)
+  (yas-global-mode 1)
+#+END_SRC
+
+* BreadCrumb
+#+BEGIN_SRC elisp
+  (use-package breadcrumb
+    :straight t
+    :init (breadcrumb-mode 1))
 #+END_SRC
 
 * Projectile
@@ -211,4 +244,54 @@
     :ensure t)
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+#+END_SRC
+
+* Notmuch
+#+BEGIN_SRC elisp
+  (use-package notmuch
+    :straight t
+    :init
+    ;; in gmail, messages are trashed by removing the 'inbox' tag, and adding the 'trash' tag. This will move messages to the gmail trash folder, but won't permnanently delete them.
+    (defvar +notmuch-delete-tags '("+trash" "-inbox" "-unread" "-new"))
+    ;; in gmail, messages are archived simply by removing the 'inbox' tag.
+    (setq notmuch-archive-tags '("-inbox" "-new"))
+    ;; show new mail first
+    :config
+    (add-to-list 'notmuch-saved-searches '(:name "new" :query "tag:new" :key "n"))
+    (setq notmuch-search-oldest-first nil))
+  (require 'notmuch)
+  (with-eval-after-load 'notmuch
+    (setq notmuch-show-logo nil)
+    (setq notmuch-show-all-tags-list t)
+    (setq notmuch-search-oldest-first nil))
+  ;; https://github.com/patrl/emacs.d/blob/main/readme.org
+  ;; Optional: Don't save outgoing mail locally.
+  (setq notmuch-fcc-dirs nil)
+  (setq message-kill-buffer-on-exit t)
+  (setq sendmail-program "gmi")
+  (setq send-mail-function 'sendmail-send-it)
+  (setq message-sendmail-extra-arguments '("send" "--quiet" "-t" "-C" "~/mail"))
+  (setq notmuch-fcc-dirs nil) ;; let gmail take care of sent mail
+#+END_SRC
+
+* Dired
+#+BEGIN_SRC elisp
+  (require 'dired)
+  (setq dired-recursive-copies 'always)
+  (setq dired-recursive-deletes 'always)
+  (setq delete-by-moving-to-trash t)
+  (setq dired-listing-switches
+        "-AGFhlv --group-directories-first --time-style=long-iso")
+  (setq dired-dwim-target t)
+  (setq dired-auto-revert-buffer #'dired-directory-changed-p) ; also see `dired-do-revert-buffer'
+  (setq dired-make-directory-clickable t) ; Emacs 29.1
+  (setq dired-free-space nil) ; Emacs 29.1
+  (setq dired-mouse-drag-files t) ; Emacs 29.1
+  (setq dired-guess-shell-alist-user ; those are the suggestions for ! and & in Dired
+        '(("\\.\\(png\\|jpe?g\\|tiff\\)" "feh" "xdg-open")
+          ("\\.\\(mp[34]\\|m4a\\|ogg\\|flac\\|webm\\|mkv\\)" "mpv" "xdg-open")
+          (".*" "xdg-open")))
+
+  (add-hook 'dired-mode-hook #'dired-hide-details-mode)
+  (add-hook 'dired-mode-hook #'hl-line-mode)
 #+END_SRC
