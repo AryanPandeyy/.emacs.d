@@ -26,6 +26,7 @@
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (fringe-mode -1)
+  (blink-cursor-mode 0)
   (scroll-bar-mode -1)
   (global-subword-mode 1)
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -39,7 +40,9 @@
   (use-package doom-themes
     :straight t
     :ensure t)
-  (load-theme 'ef-duo-light t)
+  (use-package modus-themes
+    :straight t)
+  (load-theme 'modus-operandi-tinted t)
   (add-to-list 'load-path "~/.emacs.d/nano-emacs/")
 #+END_SRC
 
@@ -57,10 +60,10 @@
 #+END_SRC
 
 #+BEGIN_SRC elisp
-  (use-package mood-line
-    :straight t
-    :ensure t
-    :init (mood-line-mode 1))
+    (use-package mood-line
+      :straight t
+      :ensure t
+      :init (mood-line-mode 1))
 #+END_SRC
 
 * Vertico
@@ -123,21 +126,28 @@
 	  completion-category-overrides '((file (styles partial-completion)))))
 #+END_SRC
 
+* Magit
+#+begin_src elisp
+  (use-package magit
+    :straight t)
+#+end_src
+
 * Eglot
 #+BEGIN_SRC elisp
-  (require 'eglot)
-  (fset #'jsonrpc--log-event #'ignore)
-  (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
-;;  (add-hook 'java-ts-mode-hook 'eglot-ensure)
-  (set-default 'indent-tabs-mode nil)
-  (use-package apheleia
-    :straight t)
-  (apheleia-global-mode t)
-  ;; https://www.leemeichin.com/posts/my-emacs-config.html
-  (use-package asdf
-    :straight (:type git :host github :repo "tabfugnic/asdf.el"))
-  (require 'asdf)
-  (asdf-enable)
+    (require 'eglot)
+    (fset #'jsonrpc--log-event #'ignore)
+    (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
+  ;;  (add-hook 'java-ts-mode-hook 'eglot-ensure)
+    (set-default 'indent-tabs-mode nil)
+    (use-package apheleia
+      :straight t)
+    (apheleia-global-mode t)
+   (setq java-ts-mode-indent-offset 2)
+    ;; https://www.leemeichin.com/posts/my-emacs-config.html
+    (use-package asdf
+      :straight (:type git :host github :repo "tabfugnic/asdf.el"))
+    (require 'asdf)
+    (asdf-enable)
 #+END_SRC 
 
 * Corfu
@@ -192,6 +202,7 @@
   (use-package treesit
   :ensure nil
   :custom
+  (treesit-font-lock-feature-list t)
   (treesit-font-lock-level 4))
   (require 'ansi-color)
   (defun colorize-compilation-buffer ()
@@ -229,8 +240,7 @@
 * BreadCrumb
 #+BEGIN_SRC elisp
   (use-package breadcrumb
-    :straight t
-    :init (breadcrumb-mode 1))
+    :straight t)
 #+END_SRC
 
 * Projectile
@@ -272,6 +282,14 @@
   (setq send-mail-function 'sendmail-send-it)
   (setq message-sendmail-extra-arguments '("send" "--quiet" "-t" "-C" "~/mail"))
   (setq notmuch-fcc-dirs nil) ;; let gmail take care of sent mail
+  ;;;; General UI
+  (setq notmuch-show-logo nil
+        notmuch-column-control 1.0
+        notmuch-hello-auto-refresh t
+        notmuch-hello-recent-searches-max 20
+        notmuch-hello-thousands-separator ""
+        notmuch-hello-sections '(notmuch-hello-insert-saved-searches)
+        notmuch-show-all-tags-list t)
 #+END_SRC
 
 * Dired
@@ -295,3 +313,11 @@
   (add-hook 'dired-mode-hook #'dired-hide-details-mode)
   (add-hook 'dired-mode-hook #'hl-line-mode)
 #+END_SRC
+
+* Denote
+#+begin_src elisp
+  (use-package denote
+    :straight t)
+  (setq denote-directory (expand-file-name "~/notes"))
+#+end_src
+
