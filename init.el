@@ -1,13 +1,45 @@
-(org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(send-mail-function 'sendmail-send-it))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(defvar bootstrap-version)
+(let ((bootstrap-file
+ (expand-file-name
+  "straight/repos/straight.el/bootstrap.el"
+  (or (bound-and-true-p straight-base-dir)
+      user-emacs-directory)))
+(bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+  (url-retrieve-synchronously
+   "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+   'silent 'inhibit-cookies)
+(goto-char (point-max))
+(eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+(straight-use-package 'use-package)
+(setq use-dialog-box nil)
+(setq use-file-dialog nil)
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(fringe-mode -1)
+(blink-cursor-mode 0)
+(scroll-bar-mode -1)
+(global-subword-mode 1)
+(defalias 'yes-or-no-p 'y-or-n-p)
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+
+(require 'ary-corfu)
+(require 'ary-dape)
+(require 'ary-denote)
+(require 'ary-dired)
+(require 'ary-eglot)
+(require 'ary-flymake)
+(require 'ary-lang)
+(require 'ary-magit)
+(require 'ary-marginalia)
+(require 'ary-notmuch)
+(require 'ary-orderless)
+(require 'ary-projectile)
+(require 'ary-snippet)
+(require 'ary-treesit)
+(require 'ary-vertico)
+(require 'ui)
