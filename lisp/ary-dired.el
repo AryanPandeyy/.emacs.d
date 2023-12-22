@@ -13,7 +13,7 @@
       '(("\\.\\(png\\|jpe?g\\|tiff\\)" "feh" "xdg-open")
         ("\\.\\(mp[34]\\|m4a\\|ogg\\|flac\\|webm\\|mkv\\)" "mpv" "xdg-open")
         (".*" "xdg-open")))
-
+(setq dired-kill-when-opening-new-dired-buffer t)
 (add-hook 'dired-mode-hook #'dired-hide-details-mode)
 (add-hook 'dired-mode-hook #'hl-line-mode)
 (provide 'ary-dired)

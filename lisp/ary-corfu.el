@@ -1,9 +1,11 @@
 (use-package corfu
   :straight t
   ;; Optional customizations
-  ;; :custom
-  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  ;; (corfu-auto t)                 ;; Enable auto completion
+  :custom
+  (corfu-auto t)
+  (corfu-cycle t)
+  (corfu-auto-prefix 1)
+  (corfu-auto-delay 0)
   ;; (corfu-separator ?\s)          ;; Orderless field separator
   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match

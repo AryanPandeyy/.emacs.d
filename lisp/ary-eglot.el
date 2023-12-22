@@ -1,56 +1,21 @@
 (require 'eglot)
+(use-package eglot
+  :bind
+  (("C-c l q" . eglot-shutdown)
+   ("C-c l Q" . eglot-shutdown-all)
+   ("C-c l d" . eglot-find-declaration)
+   ("C-c l i" . eglot-find-implementation)
+   ("C-c l t" . eglot-find-typeDefinition)
+   ("C-c l r" . eglot-rename)
+   ("C-c l f" . eglot-format)
+   ("C-c l F" . eglot-format-buffer)
+   ("C-c l x" . eglot-code-actions))
+  :custom
+  (eglot-autoshutdown t)
+  (eglot-extend-to-xref t)
+  (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance"))
+
 (fset #'jsonrpc--log-event #'ignore)
-
-;; https://github.com/xiaoxinghu/system/blob/main/m1/emacs/init.org
-;; https://www.reddit.com/r/emacs/comments/11bqzvk/emacs29_and_eglot_inlay_hints/
-(add-to-list
- 'eglot-server-programs
- '((js-mode js-ts-mode tsx-ts-mode typescript-ts-mode typescript-mode jsx-mode)
-   "typescript-language-server" "--stdio"
-   :initializationOptions
-   (:preferences
-    (
-     ;; https://github.com/microsoft/TypeScript/blob/main/src/server/protocol.ts#L3410-L3539
-     :disableSuggestions                                    :json-false     ;; boolean
-     :quotePreference                                       "single"        ;; "auto" | "double" | "single"
-     :includeCompletionsForModuleExports                    t               ;; boolean
-     :includeCompletionsForImportStatements                 t               ;; boolean
-     :includeCompletionsWithSnippetText                     t               ;; boolean
-     :includeCompletionsWithInsertText                      t               ;; boolean
-     :includeAutomaticOptionalChainCompletions              t               ;; boolean
-     :includeCompletionsWithClassMemberSnippets             t               ;; boolean
-     :includeCompletionsWithObjectLiteralMethodSnippets     t               ;; boolean
-     :useLabelDetailsInCompletionEntries                    t               ;; boolean
-     :allowIncompleteCompletions                            t               ;; boolean
-     :importModuleSpecifierPreference                       "shortest"      ;; "shortest" | "project-relative" | "relative" | "non-relative"
-     :importModuleSpecifierEnding                           "minimal"       ;; "auto" | "minimal" | "index" | "js"
-     :allowTextChangesInNewFiles                            t               ;; boolean
-     ;; :lazyConfiguredProjectsFromExternalProject                          ;; boolean
-     :providePrefixAndSuffixTextForRename                   t               ;; boolean
-     :provideRefactorNotApplicableReason                    :json-false     ;; boolean
-     :allowRenameOfImportPath                               t               ;; boolean
-     ;; :includePackageJsonAutoImports                                      ;; "auto" | "on" | "off"
-     :jsxAttributeCompletionStyle                           "auto"          ;; "auto" | "braces" | "none"
-     :displayPartsForJSDoc                                  t               ;; boolean
-     :generateReturnInDocTemplate                           t               ;; boolean
-     :includeInlayParameterNameHints                        "all"           ;; "none" | "literals" | "all"
-     :includeInlayParameterNameHintsWhenArgumentMatchesName t               ;; boolean
-     :includeInlayFunctionParameterTypeHints                t               ;; boolean,
-     :includeInlayVariableTypeHints                         t               ;; boolean
-     :includeInlayVariableTypeHintsWhenTypeMatchesName      t               ;; boolean
-     :includeInlayPropertyDeclarationTypeHints              t               ;; boolean
-     :includeInlayFunctionLikeReturnTypeHints               t               ;; boolean
-     :includeInlayEnumMemberValueHints                      t               ;; boolean
-     ;; :autoImportFileExcludePatterns                                      ;; string[]
-     ;; :organizeImportsIgnoreCase                                          ;; "auto" | boolean
-     ;; :organizeImportsCollation                                           ;; "ordinal" | "unicode"
-     ;; :organizeImportsCollationLocale                                     ;; string
-     ;; :organizeImportsNumericCollation                                    ;; boolean
-     ;; :organizeImportsAccentCollation                                     ;; boolean
-     ;; :organizeImportsCaseFirst                                           ;; "upper" | "lower" | false
-     :disableLineTextInReferences                           :json-false))))
-
-
 (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
 (add-hook 'js-ts-mode-hook 'eglot-ensure)
 ;;  (add-hook 'java-ts-mode-hook 'eglot-ensure)
@@ -64,4 +29,18 @@
   :straight (:type git :host github :repo "tabfugnic/asdf.el"))
 (require 'asdf)
 (asdf-enable)
+(use-package eldoc
+  :straight t
+  :ensure nil
+  :config
+  (setq eldoc-idle-delay 0
+        eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly
+        eldoc-echo-area-prefer-doc-buffer t
+        eldoc-echo-area-display-truncation-message nil))
+
+(use-package smartparens
+  :straight t
+  :config
+  (require 'smartparens-config)
+  (add-hook 'prog-mode-hook #'smartparens-mode))
 (provide 'ary-eglot)
