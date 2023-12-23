@@ -14,7 +14,7 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 (straight-use-package 'use-package)
-
+(setq-default pgtk-wait-for-event-timeout 0)
 (setq use-dialog-box nil)
 (setq use-file-dialog nil)
 (setq make-backup-files nil)
@@ -35,6 +35,7 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
 (require 'ary-corfu)
+(require 'ary-icons)
 (require 'ary-dape)
 (require 'ary-denote)
 (require 'ary-dired)
@@ -42,6 +43,7 @@
 (require 'ary-flymake)
 (require 'ary-lang)
 (require 'ary-magit)
+;;(require 'ary-lsp)
 (require 'ary-marginalia)
 (require 'ary-notmuch)
 (require 'ary-orderless)

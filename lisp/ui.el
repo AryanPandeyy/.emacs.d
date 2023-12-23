@@ -10,7 +10,7 @@
 (load-theme 'modus-vivendi-tinted t)
 
 (add-to-list 'default-frame-alist
-             '(font . "JetBrains Mono-14"))
+             '(font . "JetBrains Mono-12"))
 (defun rha/toggle-modus-themes ()
   "Allow quick toggling between dark and light themes."
   (interactive)
