@@ -19,7 +19,7 @@
 (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
 (add-hook 'js-ts-mode-hook 'eglot-ensure)
 ;;  (add-hook 'java-ts-mode-hook 'eglot-ensure)
-(set-default 'indent-tabs-mode nil)
+;;(set-default 'indent-tabs-mode nil)
 (use-package apheleia
   :straight t)
 (apheleia-global-mode t)
@@ -37,7 +37,6 @@
   ;; (global-eldoc-mode -1)
   ;; `eldoc-echo-area-use-multiline-p'
   (setq eldoc-idle-delay 0.5)
-  (eldoc-add-command-completions "delete-char" "lispy-delete-backward" "puni-backward-delete-char")
   (set-face-foreground 'eldoc-highlight-function-argument
                        (face-attribute 'font-lock-variable-name-face :foreground)))
 

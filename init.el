@@ -14,7 +14,7 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 (straight-use-package 'use-package)
-(setq-default pgtk-wait-for-event-timeout 0)
+
 (setq use-dialog-box nil)
 (setq use-file-dialog nil)
 (setq make-backup-files nil)
@@ -26,11 +26,17 @@
 (scroll-bar-mode -1)
 (global-subword-mode 1)
 (defalias 'yes-or-no-p 'y-or-n-p)
-
 (setq-default inhibit-startup-screen t)
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
 (setq initial-scratch-message "")
+
+;; Tab and Space
+;; Permanently indent with spaces, never with TABs
+;; M-^ delete-indentation
+(setq-default c-basic-offset   2
+              tab-width        2
+              indent-tabs-mode nil)
 
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
@@ -43,6 +49,7 @@
 (require 'ary-flymake)
 (require 'ary-lang)
 (require 'ary-magit)
+(require 'ary-org)
 ;;(require 'ary-lsp)
 (require 'ary-marginalia)
 (require 'ary-notmuch)
