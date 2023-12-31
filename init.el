@@ -38,25 +38,78 @@
               tab-width        2
               indent-tabs-mode nil)
 
-(add-to-list 'load-path "~/.emacs.d/lisp/")
+;; projectile
+(use-package ripgrep
+  :straight t)
+(use-package rg
+  :straight t)
+(use-package projectile
+  :straight t
+  :ensure t)
+(projectile-mode +1)
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
-(require 'ary-corfu)
-(require 'ary-icons)
-(require 'ary-dape)
-(require 'ary-denote)
-(require 'ary-dired)
-(require 'ary-eglot)
-(require 'ary-flymake)
-(require 'ary-lang)
-(require 'ary-magit)
-(require 'ary-org)
-;;(require 'ary-lsp)
-(require 'ary-marginalia)
-(require 'ary-notmuch)
-(require 'ary-orderless)
-(require 'ary-projectile)
-(require 'ary-snippet)
-(require 'ary-treesit)
-(require 'ary-vertico)
-(require 'ui)
+;;eglot
+(require 'eglot)
+(use-package eglot
+  :bind
+  (("C-c l q" . eglot-shutdown)
+   ("C-c l Q" . eglot-shutdown-all)
+   ("C-c l d" . eglot-find-declaration)
+   ("C-c l i" . eglot-find-implementation)
+   ("C-c l t" . eglot-find-typeDefinition)
+   ("C-c l r" . eglot-rename)
+   ("C-c l f" . eglot-format)
+   ("C-c l F" . eglot-format-buffer)
+   ("C-c l x" . eglot-code-actions))
+  :custom
+  (eglot-autoshutdown t)
+  (eglot-extend-to-xref t)
+  (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance"))
+(add-hook 'tsx-ts-mode-hook 'eglot-ensure)
+(add-hook 'js-ts-mode-hook 'eglot-ensure)
+(add-hook 'java-ts-mode-hook 'eglot-ensure)
 
+;;apheleia
+(use-package apheleia
+  :straight t)
+(apheleia-global-mode t)
+(setq java-ts-mode-indent-offset 2)
+
+;;fonts
+(add-to-list 'default-frame-alist
+             '(font . "JetBrains Mono-14"))
+
+;;dape
+(use-package dape
+  :straight t)
+(add-to-list 'eglot-server-programs
+             `((java-mode java-ts-mode) .
+               ("jdtls"
+                :initializationOptions
+                (:bundles ["/home/ap/.local/share/nvim/mason/share/java-debug-adapter/com.microsoft.java.debug.plugin-0.47.0.jar"]))))
+
+;;lang
+(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . tsx-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.js?\\'" . js-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.java?\\'" . java-ts-mode))
+
+;;yasnippet
+(use-package yasnippet
+  :straight t)
+(yas-global-mode 1)
+
+;;magit
+(use-package magit
+  :straight t)
+
+;;tree-sitter
+(use-package treesit
+  :ensure nil
+  :custom
+  (treesit-font-lock-feature-list t)
+  (treesit-font-lock-level 4))
+(require 'ansi-color)
+(defun colorize-compilation-buffer ()
+  (ansi-color-apply-on-region compilation-filter-start (point-max)))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
