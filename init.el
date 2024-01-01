@@ -29,7 +29,10 @@
 (setq-default inhibit-startup-screen t)
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
-(setq initial-scratch-message "")
+(setq initial-scratch-message "HEY!")
+(load-theme 'wombat t)
+(fido-vertical-mode)
+
 
 ;; Tab and Space
 ;; Permanently indent with spaces, never with TABs
