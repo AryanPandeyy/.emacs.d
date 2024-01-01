@@ -97,11 +97,23 @@
 (add-to-list 'auto-mode-alist '("\\.js?\\'" . js-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.java?\\'" . java-ts-mode))
 
-;;yasnippet
-(use-package yasnippet
-  :straight t)
-(yas-global-mode 1)
+;; Configure Tempel
+(use-package tempel
+  :straight t
+  :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+         ("M-*" . tempel-insert))
+  :init
+  (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+  ;; (global-tempel-abbrev-mode)
+  )
 
+;; eglot-tempel
+(use-package eglot-tempel
+  :straight t
+  :after (eglot tempel)
+  :init
+  (eglot-tempel-mode)
+  )
 ;;magit
 (use-package magit
   :straight t)
