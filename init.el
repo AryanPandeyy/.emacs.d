@@ -30,7 +30,10 @@
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
 (setq initial-scratch-message "HEY!")
-(load-theme 'wombat t)
+(load-theme 'modus-vivendi-tinted t)
+;; for grid view
+(ido-mode)
+;; for M-x mode
 (fido-vertical-mode)
 
 
@@ -72,6 +75,14 @@
 (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
 (add-hook 'js-ts-mode-hook 'eglot-ensure)
 (add-hook 'java-ts-mode-hook 'eglot-ensure)
+(add-hook 'c-ts-mode-hook 'eglot-ensure)
+(add-to-list 'eglot-server-programs
+             `((c++-ts-mode c-ts-mode) . ("clangd"))
+             `(rust-ts-mode . ("rust-analyzer" :initializationOptions
+                               (:procMacro (:enable t)
+                                           :cargo (:buildScripts (:enable t)
+                                                                 :features
+                                                                 "all")))))
 
 ;;apheleia
 (use-package apheleia
@@ -81,7 +92,7 @@
 
 ;;fonts
 (add-to-list 'default-frame-alist
-             '(font . "JetBrains Mono-14"))
+             '(font . "JetBrains Mono-16"))
 
 ;;dape
 (use-package dape
@@ -96,6 +107,7 @@
 (add-to-list 'auto-mode-alist '("\\.tsx?\\'" . tsx-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.js?\\'" . js-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.java?\\'" . java-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.c?\\'" . c-ts-mode))
 
 ;; Configure Tempel
 (use-package tempel
@@ -114,6 +126,7 @@
   :init
   (eglot-tempel-mode)
   )
+
 ;;magit
 (use-package magit
   :straight t)
