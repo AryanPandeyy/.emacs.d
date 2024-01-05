@@ -75,6 +75,7 @@
 (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
 (add-hook 'js-ts-mode-hook 'eglot-ensure)
 (add-hook 'java-ts-mode-hook 'eglot-ensure)
+(add-hook 'python-ts-mode-hook 'eglot-ensure)
 (add-hook 'c-ts-mode-hook 'eglot-ensure)
 (add-to-list 'eglot-server-programs
              `((c++-ts-mode c-ts-mode) . ("clangd"))
@@ -108,6 +109,17 @@
 (add-to-list 'auto-mode-alist '("\\.js?\\'" . js-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.java?\\'" . java-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.c?\\'" . c-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.py?\\'" . python-ts-mode))
+
+;; python
+(use-package pet
+  :straight t
+  :config
+  (add-hook 'python-ts-mode-hook 'pet-mode -10))
+(use-package flymake-ruff
+  :straight t
+  :hook (eglot-managed-mode . flymake-ruff-load))
+
 
 ;; Configure Tempel
 (use-package tempel
