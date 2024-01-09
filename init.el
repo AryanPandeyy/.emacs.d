@@ -36,6 +36,14 @@
 ;; for M-x mode
 (fido-vertical-mode)
 
+;; https://stackoverflow.com/questions/2078855/about-the-forward-and-backward-a-word-behaviour-in-emacs
+(defun next-word (p)
+  "Move point to the beginning of the next word, past any spaces"
+  (interactive "d")
+  (forward-word)
+  (forward-word)
+  (backward-word))
+(global-set-key "\M-f" 'next-word)
 
 ;; Tab and Space
 ;; Permanently indent with spaces, never with TABs
@@ -56,34 +64,73 @@
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
 ;;eglot
-(require 'eglot)
-(use-package eglot
-  :bind
-  (("C-c l q" . eglot-shutdown)
-   ("C-c l Q" . eglot-shutdown-all)
-   ("C-c l d" . eglot-find-declaration)
-   ("C-c l i" . eglot-find-implementation)
-   ("C-c l t" . eglot-find-typeDefinition)
-   ("C-c l r" . eglot-rename)
-   ("C-c l f" . eglot-format)
-   ("C-c l F" . eglot-format-buffer)
-   ("C-c l x" . eglot-code-actions))
-  :custom
-  (eglot-autoshutdown t)
-  (eglot-extend-to-xref t)
-  (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance"))
-(add-hook 'tsx-ts-mode-hook 'eglot-ensure)
-(add-hook 'js-ts-mode-hook 'eglot-ensure)
-(add-hook 'java-ts-mode-hook 'eglot-ensure)
-(add-hook 'python-ts-mode-hook 'eglot-ensure)
-(add-hook 'c-ts-mode-hook 'eglot-ensure)
-(add-to-list 'eglot-server-programs
-             `((c++-ts-mode c-ts-mode) . ("clangd"))
-             `(rust-ts-mode . ("rust-analyzer" :initializationOptions
-                               (:procMacro (:enable t)
-                                           :cargo (:buildScripts (:enable t)
-                                                                 :features
-                                                                 "all")))))
+;; (require 'eglot)
+;; (use-package eglot
+;;   :bind
+;;   (("C-c l q" . eglot-shutdown)
+;;    ("C-c l Q" . eglot-shutdown-all)
+;;    ("C-c l d" . eglot-find-declaration)
+;;    ("C-c l i" . eglot-find-implementation)
+;;    ("C-c l t" . eglot-find-typeDefinition)
+;;    ("C-c l r" . eglot-rename)
+;;    ("C-c l f" . eglot-format)
+;;    ("C-c l F" . eglot-format-buffer)
+;;    ("C-c l x" . eglot-code-actions))
+;;   :custom
+;;   (eglot-autoshutdown t)
+;;   (eglot-extend-to-xref t)
+;;   (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance"))
+;; (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
+;; (add-hook 'js-ts-mode-hook 'eglot-ensure)
+;; (add-hook 'java-ts-mode-hook 'eglot-ensure)
+;; (add-hook 'python-ts-mode-hook 'eglot-ensure)
+;; (add-hook 'c-ts-mode-hook 'eglot-ensure)
+;; (add-to-list 'eglot-server-programs
+;;              `((c++-ts-mode c-ts-mode) . ("clangd"))
+;;              `(rust-ts-mode . ("rust-analyzer" :initializationOptions
+;;                                (:procMacro (:enable t)
+;;                                            :cargo (:buildScripts (:enable t)
+;;                                                                  :features
+;;                                                                  "all")))))
+
+;; lsp
+(use-package lsp-mode
+  :straight t
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :hook ((tsx-ts-mode . lsp)
+         (java-ts-mode . lsp)
+         (js-ts-mode . lsp)
+         (typescript-ts-mode . lsp))
+  :config
+  (setq lsp-headerline-breadcrumb-enable nil))
+
+;;dap
+(use-package dap-mode
+  :straight t)
+
+;; flycheck
+(use-package flycheck
+  :straight t)
+
+;; tailwindcss
+(use-package lsp-tailwindcss
+  :straight t
+  :init
+  (setq lsp-tailwindcss-add-on-mode t))
+
+;; java
+(use-package lsp-java
+  :straight t)
+
+;; solidity
+(use-package solidity-mode
+  :straight t)
+(setq solidity-solc-path "/usr/bin/solc")
+
+(use-package solidity-flycheck
+  :straight t)
+(setq solidity-flycheck-solc-checker-active t)
 
 ;;apheleia
 (use-package apheleia
@@ -96,20 +143,20 @@
              '(font . "JetBrains Mono-16"))
 
 ;;dape
-(use-package dape
-  :straight t)
-(add-to-list 'eglot-server-programs
-             `((java-mode java-ts-mode) .
-               ("jdtls"
-                :initializationOptions
-                (:bundles ["/home/ap/.local/share/nvim/mason/share/java-debug-adapter/com.microsoft.java.debug.plugin-0.47.0.jar"]))))
+;; (use-package dape
+;;   :straight t)
+;; (add-to-list 'eglot-server-programs
+;;              `((java-mode java-ts-mode) .
+;;                ("jdtls"
+;;                 :initializationOptions
+;;                 (:bundles ["/home/ap/.local/share/nvim/mason/share/java-debug-adapter/com.microsoft.java.debug.plugin-0.47.0.jar"]))))
 
 ;;lang
-(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . tsx-ts-mode))
-(add-to-list 'auto-mode-alist '("\\.js?\\'" . js-ts-mode))
-(add-to-list 'auto-mode-alist '("\\.java?\\'" . java-ts-mode))
-(add-to-list 'auto-mode-alist '("\\.c?\\'" . c-ts-mode))
-(add-to-list 'auto-mode-alist '("\\.py?\\'" . python-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.c\\'" . c-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
 
 ;; python
 (use-package pet
@@ -132,12 +179,12 @@
   )
 
 ;; eglot-tempel
-(use-package eglot-tempel
-  :straight t
-  :after (eglot tempel)
-  :init
-  (eglot-tempel-mode)
-  )
+;; (use-package eglot-tempel
+;;   :straight t
+;;   :after (eglot tempel)
+;;   :init
+;;   (eglot-tempel-mode)
+;;   )
 
 ;;magit
 (use-package magit
