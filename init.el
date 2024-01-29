@@ -15,6 +15,22 @@
   (load bootstrap-file nil 'nomessage))
 (straight-use-package 'use-package)
 
+;; hacker-news https://news.ycombinator.com/item?id=39119835
+;; if you don't use RTL ever, this could improve perf
+(setq-default bidi-display-reordering 'left-to-right
+              bidi-paragraph-direction 'left-to-right
+              bidi-inhibit-bpa t)
+
+;; improves terminal emulator (vterm/eat) throughput
+(setq read-process-output-max (* 2 1024 1024)
+      process-adaptive-read-buffering nil)
+
+(setq fast-but-imprecise-scrolling t
+      redisplay-skip-fontification-on-input t
+      inhibit-compacting-font-caches t)
+
+(setq idle-update-delay 1.0)
+
 (setq use-dialog-box nil)
 (setq use-file-dialog nil)
 (setq make-backup-files nil)
@@ -101,9 +117,16 @@
   :hook ((tsx-ts-mode . lsp)
          (java-ts-mode . lsp)
          (js-ts-mode . lsp)
-         (typescript-ts-mode . lsp))
+         (typescript-ts-mode . lsp)
+         (solidity-mode . lsp)
+         (c-ts-mode . lsp)
+         (c++-ts-mode . lsp)
+         (rust-ts-mode . lsp)
+         (prisma-ts-mode . lsp))
   :config
-  (setq lsp-headerline-breadcrumb-enable nil))
+  (setq lsp-headerline-breadcrumb-enable nil)
+  (setq lsp-completion-provider :none)
+  (setq lsp-signature-render-documentation nil))
 
 ;;dap
 (use-package dap-mode
@@ -132,6 +155,15 @@
   :straight t)
 (setq solidity-flycheck-solc-checker-active t)
 
+;;prisma
+(use-package prisma-mode
+  :straight (prisma-mode :type git :host github :repo "pimeys/emacs-prisma-mode"))
+(require 'treesit)
+(add-to-list
+ 'treesit-language-source-alist
+ '(prisma "https://github.com/victorhqc/tree-sitter-prisma"))
+
+
 ;;apheleia
 (use-package apheleia
   :straight t)
@@ -157,6 +189,7 @@
 (add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.c\\'" . c-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
 
 ;; python
 (use-package pet
@@ -169,14 +202,17 @@
 
 
 ;; Configure Tempel
-(use-package tempel
-  :straight t
-  :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
-         ("M-*" . tempel-insert))
-  :init
-  (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
-  ;; (global-tempel-abbrev-mode)
-  )
+;; (use-package tempel
+;;   :straight t
+;;   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+;;          ("M-*" . tempel-insert))
+;;   :init
+;;   (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+;;   ;; (global-tempel-abbrev-mode)
+;;   )
+(use-package yasnippet
+  :straight t)
+(yas-global-mode 1)
 
 ;; eglot-tempel
 ;; (use-package eglot-tempel
