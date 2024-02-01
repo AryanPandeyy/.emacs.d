@@ -15,22 +15,6 @@
   (load bootstrap-file nil 'nomessage))
 (straight-use-package 'use-package)
 
-;; hacker-news https://news.ycombinator.com/item?id=39119835
-;; if you don't use RTL ever, this could improve perf
-(setq-default bidi-display-reordering 'left-to-right
-              bidi-paragraph-direction 'left-to-right
-              bidi-inhibit-bpa t)
-
-;; improves terminal emulator (vterm/eat) throughput
-(setq read-process-output-max (* 2 1024 1024)
-      process-adaptive-read-buffering nil)
-
-(setq fast-but-imprecise-scrolling t
-      redisplay-skip-fontification-on-input t
-      inhibit-compacting-font-caches t)
-
-(setq idle-update-delay 1.0)
-
 (setq use-dialog-box nil)
 (setq use-file-dialog nil)
 (setq make-backup-files nil)
@@ -45,27 +29,26 @@
 (setq-default inhibit-startup-screen t)
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
-(setq initial-scratch-message "HEY!")
 (load-theme 'modus-vivendi-tinted t)
 ;; for grid view
 (ido-mode)
+(global-set-key
+ "\M-x"
+ (lambda ()
+   (interactive)
+   (call-interactively
+    (intern
+     (ido-completing-read
+      "M-x "
+      (all-completions "" obarray 'commandp))))))
 ;; for M-x mode
-(fido-vertical-mode)
-
-;; https://stackoverflow.com/questions/2078855/about-the-forward-and-backward-a-word-behaviour-in-emacs
-(defun next-word (p)
-  "Move point to the beginning of the next word, past any spaces"
-  (interactive "d")
-  (forward-word)
-  (forward-word)
-  (backward-word))
-(global-set-key "\M-f" 'next-word)
+;;(fido-vertical-mode)
 
 ;; Tab and Space
 ;; Permanently indent with spaces, never with TABs
 ;; M-^ delete-indentation
 (setq-default c-basic-offset   2
-              tab-width        2
+              tab-width        4
               indent-tabs-mode nil)
 
 ;; projectile
@@ -80,89 +63,34 @@
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
 ;;eglot
-;; (require 'eglot)
-;; (use-package eglot
-;;   :bind
-;;   (("C-c l q" . eglot-shutdown)
-;;    ("C-c l Q" . eglot-shutdown-all)
-;;    ("C-c l d" . eglot-find-declaration)
-;;    ("C-c l i" . eglot-find-implementation)
-;;    ("C-c l t" . eglot-find-typeDefinition)
-;;    ("C-c l r" . eglot-rename)
-;;    ("C-c l f" . eglot-format)
-;;    ("C-c l F" . eglot-format-buffer)
-;;    ("C-c l x" . eglot-code-actions))
-;;   :custom
-;;   (eglot-autoshutdown t)
-;;   (eglot-extend-to-xref t)
-;;   (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance"))
-;; (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
-;; (add-hook 'js-ts-mode-hook 'eglot-ensure)
-;; (add-hook 'java-ts-mode-hook 'eglot-ensure)
-;; (add-hook 'python-ts-mode-hook 'eglot-ensure)
-;; (add-hook 'c-ts-mode-hook 'eglot-ensure)
-;; (add-to-list 'eglot-server-programs
-;;              `((c++-ts-mode c-ts-mode) . ("clangd"))
-;;              `(rust-ts-mode . ("rust-analyzer" :initializationOptions
-;;                                (:procMacro (:enable t)
-;;                                            :cargo (:buildScripts (:enable t)
-;;                                                                  :features
-;;                                                                  "all")))))
-
-;; lsp
-(use-package lsp-mode
-  :straight t
-  :init
-  (setq lsp-keymap-prefix "C-c l")
-  :hook ((tsx-ts-mode . lsp)
-         (java-ts-mode . lsp)
-         (js-ts-mode . lsp)
-         (typescript-ts-mode . lsp)
-         (solidity-mode . lsp)
-         (c-ts-mode . lsp)
-         (c++-ts-mode . lsp)
-         (rust-ts-mode . lsp)
-         (prisma-ts-mode . lsp))
-  :config
-  (setq lsp-headerline-breadcrumb-enable nil)
-  (setq lsp-completion-provider :none)
-  (setq lsp-signature-render-documentation nil))
-
-;;dap
-(use-package dap-mode
-  :straight t)
-
-;; flycheck
-(use-package flycheck
-  :straight t)
-
-;; tailwindcss
-(use-package lsp-tailwindcss
-  :straight t
-  :init
-  (setq lsp-tailwindcss-add-on-mode t))
-
-;; java
-(use-package lsp-java
-  :straight t)
-
-;; solidity
-(use-package solidity-mode
-  :straight t)
-(setq solidity-solc-path "/usr/bin/solc")
-
-(use-package solidity-flycheck
-  :straight t)
-(setq solidity-flycheck-solc-checker-active t)
-
-;;prisma
-(use-package prisma-mode
-  :straight (prisma-mode :type git :host github :repo "pimeys/emacs-prisma-mode"))
-(require 'treesit)
-(add-to-list
- 'treesit-language-source-alist
- '(prisma "https://github.com/victorhqc/tree-sitter-prisma"))
-
+(require 'eglot)
+(use-package eglot
+  :bind
+  (("C-c l q" . eglot-shutdown)
+   ("C-c l Q" . eglot-shutdown-all)
+   ("C-c l d" . eglot-find-declaration)
+   ("C-c l i" . eglot-find-implementation)
+   ("C-c l t" . eglot-find-typeDefinition)
+   ("C-c l r" . eglot-rename)
+   ("C-c l f" . eglot-format)
+   ("C-c l F" . eglot-format-buffer)
+   ("C-c l x" . eglot-code-actions))
+  :custom
+  (eglot-extend-to-xref t)
+  (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance"))
+(add-hook 'tsx-ts-mode-hook 'eglot-ensure)
+(add-hook 'js-ts-mode-hook 'eglot-ensure)
+(add-hook 'java-ts-mode-hook 'eglot-ensure)
+(add-hook 'python-ts-mode-hook 'eglot-ensure)
+(add-hook 'c-ts-mode-hook 'eglot-ensure)
+(add-hook 'rust-ts-mode-hook 'eglot-ensure)
+(add-to-list 'eglot-server-programs
+             `((c++-ts-mode c-ts-mode) . ("clangd"))
+             `(rust-ts-mode . ("rust-analyzer" :initializationOptions
+                               (:procMacro (:enable t)
+                                           :cargo (:buildScripts (:enable t)
+                                                                 :features
+                                                                 "all")))))
 
 ;;apheleia
 (use-package apheleia
@@ -172,16 +100,16 @@
 
 ;;fonts
 (add-to-list 'default-frame-alist
-             '(font . "JetBrains Mono-16"))
+             '(font . "Iosevka-16"))
 
 ;;dape
-;; (use-package dape
-;;   :straight t)
-;; (add-to-list 'eglot-server-programs
-;;              `((java-mode java-ts-mode) .
-;;                ("jdtls"
-;;                 :initializationOptions
-;;                 (:bundles ["/home/ap/.local/share/nvim/mason/share/java-debug-adapter/com.microsoft.java.debug.plugin-0.47.0.jar"]))))
+(use-package dape
+  :straight t)
+(add-to-list 'eglot-server-programs
+             `((java-mode java-ts-mode) .
+               ("jdtls"
+                :initializationOptions
+                (:bundles ["/home/ap/.local/share/nvim/mason/share/java-debug-adapter/com.microsoft.java.debug.plugin-0.47.0.jar"]))))
 
 ;;lang
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
@@ -200,27 +128,9 @@
   :straight t
   :hook (eglot-managed-mode . flymake-ruff-load))
 
-
-;; Configure Tempel
-;; (use-package tempel
-;;   :straight t
-;;   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
-;;          ("M-*" . tempel-insert))
-;;   :init
-;;   (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
-;;   ;; (global-tempel-abbrev-mode)
-;;   )
 (use-package yasnippet
   :straight t)
 (yas-global-mode 1)
-
-;; eglot-tempel
-;; (use-package eglot-tempel
-;;   :straight t
-;;   :after (eglot tempel)
-;;   :init
-;;   (eglot-tempel-mode)
-;;   )
 
 ;;magit
 (use-package magit
