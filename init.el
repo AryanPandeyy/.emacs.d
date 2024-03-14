@@ -19,6 +19,7 @@
 (setq use-file-dialog nil)
 (setq make-backup-files nil)
 (setq auto-save-default nil)
+
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (fringe-mode -1)
@@ -29,20 +30,6 @@
 (setq-default inhibit-startup-screen t)
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
-(load-theme 'modus-vivendi-tinted t)
-;; for grid view
-(ido-mode)
-(global-set-key
- "\M-x"
- (lambda ()
-   (interactive)
-   (call-interactively
-    (intern
-     (ido-completing-read
-      "M-x "
-      (all-completions "" obarray 'commandp))))))
-;; for M-x mode
-;;(fido-vertical-mode)
 
 ;; Tab and Space
 ;; Permanently indent with spaces, never with TABs
@@ -51,18 +38,24 @@
               tab-width        4
               indent-tabs-mode nil)
 
-;; projectile
-(use-package ripgrep
-  :straight t)
-(use-package rg
-  :straight t)
-(use-package projectile
+(use-package project
   :straight t
   :ensure t)
-(projectile-mode +1)
-(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
-;;eglot
+(use-package corfu
+  :straight t
+  :ensure t
+  :custom
+  (corfu-popupinfo-mode 1)
+  (setq corfu-popupinfo-delay '(1.25 . 0.5))
+  (setq corfu-min-width 20)
+  :init
+  (global-corfu-mode))
+(define-key corfu-map (kbd "<tab>") #'corfu-complete)
+(setq eldoc-message-function #'message) 
+(add-hook 'prog-mode-hook #'eldoc-mode)
+
+
 (require 'eglot)
 (use-package eglot
   :bind
@@ -74,11 +67,20 @@
    ("C-c l r" . eglot-rename)
    ("C-c l f" . eglot-format)
    ("C-c l F" . eglot-format-buffer)
-   ("C-c l x" . eglot-code-actions))
+   ("C-c l a" . eglot-code-actions))
   :custom
-  (eglot-extend-to-xref t)
-  (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance"))
+  (eglot-extend-to-xref t))
+
+;; C-x w s to toggle https://l.opnxng.com/r/emacs/comments/111ix4h/seamlessly_merge_multiple_documentation_sources/
+(add-to-list 'display-buffer-alist
+             '("^\\*eldoc.*\\*"
+               (display-buffer-reuse-window display-buffer-in-side-window)
+               (dedicated . t)
+               (side . right)
+               (inhibit-same-window . t)))
+
 (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
+(add-hook 'typescript-ts-mode-hook 'eglot-ensure)
 (add-hook 'js-ts-mode-hook 'eglot-ensure)
 (add-hook 'java-ts-mode-hook 'eglot-ensure)
 (add-hook 'python-ts-mode-hook 'eglot-ensure)
@@ -109,24 +111,16 @@
              `((java-mode java-ts-mode) .
                ("jdtls"
                 :initializationOptions
-                (:bundles ["/home/ap/.local/share/nvim/mason/share/java-debug-adapter/com.microsoft.java.debug.plugin-0.47.0.jar"]))))
+                (:bundles ["/home/ap/.local/share/nvim/mason/share/java-debug-adapter/com.microsoft.java.debug.plugin-0.50.0.jar"]))))
 
 ;;lang
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.c\\'" . c-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
-
-;; python
-(use-package pet
-  :straight t
-  :config
-  (add-hook 'python-ts-mode-hook 'pet-mode -10))
-(use-package flymake-ruff
-  :straight t
-  :hook (eglot-managed-mode . flymake-ruff-load))
 
 (use-package yasnippet
   :straight t)
@@ -146,3 +140,88 @@
 (defun colorize-compilation-buffer ()
   (ansi-color-apply-on-region compilation-filter-start (point-max)))
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+
+;; Enable vertico
+(use-package vertico
+  :straight t
+  :ensure t
+  :init
+  (vertico-mode)
+  (setq vertico-resize t)
+  (setq vertico-cycle t))
+
+;; kanagawa theme
+(use-package kanagawa-theme
+  :straight t
+  :ensure t)
+(load-theme 'kanagawa t)
+
+;; multiple cursors used by rexim
+(use-package multiple-cursors
+  :straight t
+  :ensure t)
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+(global-set-key (kbd "C-\"")        'mc/skip-to-next-like-this)
+(global-set-key (kbd "C-:")         'mc/skip-to-previous-like-this)
+;; keybindings to move lines
+(load-file "~/.emacs.d/custom.el")
+
+;; marginalia to desc option
+(use-package marginalia
+  :straight t
+  :ensure t
+  :init
+  (marginalia-mode))
+
+(use-package consult
+  :straight t
+  :ensure t
+  :bind (;; A recursive grep
+         ("M-s M-g" . consult-grep)
+         ;; Search for files names recursively
+         ("M-s M-f" . consult-find)
+         ;; Search through the outline (headings) of the file
+         ("M-s M-o" . consult-outline)
+         ;; Search the current buffer
+         ("M-s M-l" . consult-line)
+         ;; Switch to another buffer, or bookmarked file, or recently
+         ;; opened file.
+         ("M-s M-b" . consult-buffer)))
+
+(use-package orderless
+  :straight t
+  :ensure t
+  :config
+  (setq completion-styles '(orderless basic)))
+
+;;; Icons
+(use-package nerd-icons
+  :straight t
+  :ensure t)
+
+(use-package nerd-icons-completion
+  :straight t
+  :ensure t
+  :custom
+  (nerd-icons-completion-marginalia-setup)
+  (nerd-icons-completion-mode 1))
+
+(use-package nerd-icons-corfu
+  :straight t
+  :ensure t
+  :config
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+
+(use-package nerd-icons-dired
+  :straight t
+  :ensure t
+  :config
+  (add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
+  (add-hook 'dired-mode-hook #'dired-hide-details-mode))
+
+(load-file "~/.emacs.d/sol.el")
+
+(put 'dired-find-alternate-file 'disabled nil)
