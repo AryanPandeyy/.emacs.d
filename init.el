@@ -45,19 +45,23 @@
 (use-package corfu
   :straight t
   :ensure t
-  :custom
-  (corfu-popupinfo-mode 1)
-  (setq corfu-popupinfo-delay '(1.25 . 0.5))
-  (setq corfu-min-width 20)
   :init
   (global-corfu-mode))
 (define-key corfu-map (kbd "<tab>") #'corfu-complete)
 (setq eldoc-message-function #'message) 
 (add-hook 'prog-mode-hook #'eldoc-mode)
 
+(use-package cape
+  :straight t
+  :ensure t
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-elisp-block))
 
-(require 'eglot)
 (use-package eglot
+  :straight t
+  :ensure t
   :bind
   (("C-c l q" . eglot-shutdown)
    ("C-c l Q" . eglot-shutdown-all)
@@ -71,13 +75,18 @@
   :custom
   (eglot-extend-to-xref t))
 
-;; C-x w s to toggle https://l.opnxng.com/r/emacs/comments/111ix4h/seamlessly_merge_multiple_documentation_sources/
-(add-to-list 'display-buffer-alist
-             '("^\\*eldoc.*\\*"
-               (display-buffer-reuse-window display-buffer-in-side-window)
-               (dedicated . t)
-               (side . right)
-               (inhibit-same-window . t)))
+(use-package flycheck
+  :straight t
+  :ensure t
+  :config
+  (add-hook 'after-init-hook #'global-flycheck-mode))
+
+(use-package flycheck-eglot
+  :straight t
+  :ensure t
+  :after (flycheck eglot)
+  :config
+  (global-flycheck-eglot-mode 1))
 
 (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
 (add-hook 'typescript-ts-mode-hook 'eglot-ensure)
@@ -86,6 +95,7 @@
 (add-hook 'python-ts-mode-hook 'eglot-ensure)
 (add-hook 'c-ts-mode-hook 'eglot-ensure)
 (add-hook 'rust-ts-mode-hook 'eglot-ensure)
+(require 'eglot)
 (add-to-list 'eglot-server-programs
              `((c++-ts-mode c-ts-mode) . ("clangd"))
              `(rust-ts-mode . ("rust-analyzer" :initializationOptions
@@ -166,8 +176,6 @@
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 (global-set-key (kbd "C-\"")        'mc/skip-to-next-like-this)
 (global-set-key (kbd "C-:")         'mc/skip-to-previous-like-this)
-;; keybindings to move lines
-(load-file "~/.emacs.d/custom.el")
 
 ;; marginalia to desc option
 (use-package marginalia
@@ -175,21 +183,6 @@
   :ensure t
   :init
   (marginalia-mode))
-
-(use-package consult
-  :straight t
-  :ensure t
-  :bind (;; A recursive grep
-         ("M-s M-g" . consult-grep)
-         ;; Search for files names recursively
-         ("M-s M-f" . consult-find)
-         ;; Search through the outline (headings) of the file
-         ("M-s M-o" . consult-outline)
-         ;; Search the current buffer
-         ("M-s M-l" . consult-line)
-         ;; Switch to another buffer, or bookmarked file, or recently
-         ;; opened file.
-         ("M-s M-b" . consult-buffer)))
 
 (use-package orderless
   :straight t
@@ -222,6 +215,18 @@
   (add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
   (add-hook 'dired-mode-hook #'dired-hide-details-mode))
 
+(use-package doom-modeline
+  :straight t
+  :ensure t
+  :init
+  (doom-modeline-mode 1))
+(straight-use-package
+ '(eat :type git
+       :host codeberg
+       :repo "akib/emacs-eat"
+       :files ("*.el" ("term" "term/*.el") "*.texi"
+               "*.ti" ("terminfo/e" "terminfo/e/*")
+               ("terminfo/65" "terminfo/65/*")
+               ("integration" "integration/*")
+               (:exclude ".dir-locals.el" "*-tests.el"))))
 (load-file "~/.emacs.d/sol.el")
-
-(put 'dired-find-alternate-file 'disabled nil)
