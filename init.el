@@ -48,7 +48,7 @@
   :init
   (global-corfu-mode))
 (define-key corfu-map (kbd "<tab>") #'corfu-complete)
-(setq eldoc-message-function #'message) 
+(setq eldoc-message-function #'message)
 (add-hook 'prog-mode-hook #'eldoc-mode)
 
 (use-package cape
@@ -94,6 +94,7 @@
 (add-hook 'java-ts-mode-hook 'eglot-ensure)
 (add-hook 'python-ts-mode-hook 'eglot-ensure)
 (add-hook 'c-ts-mode-hook 'eglot-ensure)
+(add-hook 'c++-ts-mode-hook 'eglot-ensure)
 (add-hook 'rust-ts-mode-hook 'eglot-ensure)
 (require 'eglot)
 (add-to-list 'eglot-server-programs
@@ -112,7 +113,7 @@
 
 ;;fonts
 (add-to-list 'default-frame-alist
-             '(font . "Iosevka-16"))
+             '(font . "Iosevka-14"))
 
 ;;dape
 (use-package dape
@@ -129,6 +130,7 @@
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.c\\'" . c-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.cpp\\'" . c++-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
 
@@ -161,10 +163,10 @@
   (setq vertico-cycle t))
 
 ;; kanagawa theme
-(use-package kanagawa-theme
-  :straight t
-  :ensure t)
-(load-theme 'kanagawa t)
+;; (use-package kanagawa-theme
+;;   :straight t
+;;   :ensure t)
+(load-theme 'modus-vivendi t)
 
 ;; multiple cursors used by rexim
 (use-package multiple-cursors
@@ -229,4 +231,15 @@
                ("terminfo/65" "terminfo/65/*")
                ("integration" "integration/*")
                (:exclude ".dir-locals.el" "*-tests.el"))))
+
+;;; Whitespace mode
+(defun rc/set-up-whitespace-handling ()
+  (interactive)
+  (whitespace-mode 1)
+  (add-to-list 'write-file-functions 'delete-trailing-whitespace))
+(setq whitespace-style  '(face tabs spaces trailing space-before-tab newline indentation empty space-after-tab space-mark tab-mark))
+(add-hook 'prog-mode-hook 'rc/set-up-whitespace-handling)
+
+;;(setq whitespace-style '(trailing space-mark))
+
 (load-file "~/.emacs.d/sol.el")
