@@ -73,7 +73,51 @@
    ("C-c l F" . eglot-format-buffer)
    ("C-c l a" . eglot-code-actions))
   :custom
-  (eglot-extend-to-xref t))
+  (eglot-extend-to-xref t)
+  :config
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs
+                 `(java-ts-mode . ("/home/ap/.local/share/nvim/mason/packages/jdtls/bin/jdtls"
+                                   "-Declipse.application=org.eclipse.jdt.ls.core.id1"
+                                   "-Dosgi.bundles.defaultStartLevel=4"
+                                   "-Declipse.product=org.eclipse.jdt.ls.core.product"
+                                   "-Dlog.protocol=true"
+                                   "-Dlog.level=ALL"
+                                   "-Xmx1g"
+                                   "--add-modules=ALL-SYSTEM"
+                                   "--add-opens"
+                                   "java.base/java.util=ALL-UNNAMED"
+                                   "--add-opens"
+                                   "java.base/java.lang=ALL-UNNAMED"
+                                   "-jar"
+                                   "/home/ap/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_1.6.700.v20231214-2017.jar"
+                                   "-configuration"
+                                   "/home/ap/.local/share/nvim/mason/packages/jdtls/config_linux/"
+                                   "-data"
+                                   "/home/ap/.emacs.d/.cache/lsp/jdtls"
+                                   ;; (expand-file-name  (md5 (project-root (project-current t)))
+                                   ;;                    (concat user-emacs-directory
+                                   ;;                            ".cache/lsp/jdtls/"))
+                                   :initializationOptions
+                                   '(:settings
+                                     (:java
+                                      (:format
+                                       (:enabled "true"
+                                                 :settings
+                                                 (:url (concat "file:/" user-emacs-directory "/lsp-java/GoogleStyles.xml")
+                                                       :profile "GoogleStyle"))
+                                       :completion (:guessMethodArguments t)
+                                       :autobuild (:enabled "false")))
+                                     :extendClientCapabilities (:classFileContentSupport t))
+                                   )))))
+
+;; https://git.sr.ht/~kennyballou/dotfiles.git/tree/master/item/config/emacs/emacs.d/emacs.org
+
+;;https://github.com/zsxh/emacs.d/blob/master/lisp/init-lang-java.el
+
+(use-package markdown-mode
+  :straight t
+  :ensure t)
 
 (use-package flycheck
   :straight t
@@ -97,18 +141,12 @@
 (add-hook 'c++-ts-mode-hook 'eglot-ensure)
 (add-hook 'rust-ts-mode-hook 'eglot-ensure)
 (require 'eglot)
-(add-to-list 'eglot-server-programs
-             `((c++-ts-mode c-ts-mode) . ("clangd"))
-             `(rust-ts-mode . ("rust-analyzer" :initializationOptions
-                               (:procMacro (:enable t)
-                                           :cargo (:buildScripts (:enable t)
-                                                                 :features
-                                                                 "all")))))
 
 ;;apheleia
 (use-package apheleia
-  :straight t)
-(apheleia-global-mode t)
+  :straight t
+  :config
+  (apheleia-global-mode t))
 (setq java-ts-mode-indent-offset 2)
 
 ;;fonts
@@ -118,11 +156,7 @@
 ;;dape
 (use-package dape
   :straight t)
-(add-to-list 'eglot-server-programs
-             `((java-mode java-ts-mode) .
-               ("jdtls"
-                :initializationOptions
-                (:bundles ["/home/ap/.local/share/nvim/mason/share/java-debug-adapter/com.microsoft.java.debug.plugin-0.50.0.jar"]))))
+
 
 ;;lang
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
