@@ -42,105 +42,11 @@
   :straight t
   :ensure t)
 
-(use-package corfu
-  :straight t
-  :ensure t
-  :init
-  (global-corfu-mode))
-(define-key corfu-map (kbd "<tab>") #'corfu-complete)
-(setq eldoc-message-function #'message)
-(add-hook 'prog-mode-hook #'eldoc-mode)
-
-(use-package cape
-  :straight t
-  :ensure t
-  :init
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-elisp-block))
-
-(use-package eglot
-  :straight t
-  :ensure t
-  :bind
-  (("C-c l q" . eglot-shutdown)
-   ("C-c l Q" . eglot-shutdown-all)
-   ("C-c l d" . eglot-find-declaration)
-   ("C-c l i" . eglot-find-implementation)
-   ("C-c l t" . eglot-find-typeDefinition)
-   ("C-c l r" . eglot-rename)
-   ("C-c l f" . eglot-format)
-   ("C-c l F" . eglot-format-buffer)
-   ("C-c l a" . eglot-code-actions))
-  :custom
-  (eglot-extend-to-xref t)
-  :config
-  (with-eval-after-load 'eglot
-    (add-to-list 'eglot-server-programs
-                 `(java-ts-mode . ("/home/ap/.local/share/nvim/mason/packages/jdtls/bin/jdtls"
-                                   "-Declipse.application=org.eclipse.jdt.ls.core.id1"
-                                   "-Dosgi.bundles.defaultStartLevel=4"
-                                   "-Declipse.product=org.eclipse.jdt.ls.core.product"
-                                   "-Dlog.protocol=true"
-                                   "-Dlog.level=ALL"
-                                   "-Xmx1g"
-                                   "--add-modules=ALL-SYSTEM"
-                                   "--add-opens"
-                                   "java.base/java.util=ALL-UNNAMED"
-                                   "--add-opens"
-                                   "java.base/java.lang=ALL-UNNAMED"
-                                   "-jar"
-                                   "/home/ap/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_1.6.700.v20231214-2017.jar"
-                                   "-configuration"
-                                   "/home/ap/.local/share/nvim/mason/packages/jdtls/config_linux/"
-                                   "-data"
-                                   "/home/ap/.emacs.d/.cache/lsp/jdtls"
-                                   ;; (expand-file-name  (md5 (project-root (project-current t)))
-                                   ;;                    (concat user-emacs-directory
-                                   ;;                            ".cache/lsp/jdtls/"))
-                                   :initializationOptions
-                                   '(:settings
-                                     (:java
-                                      (:format
-                                       (:enabled "true"
-                                                 :settings
-                                                 (:url (concat "file:/" user-emacs-directory "/lsp-java/GoogleStyles.xml")
-                                                       :profile "GoogleStyle"))
-                                       :completion (:guessMethodArguments t)
-                                       :autobuild (:enabled "false")))
-                                     :extendClientCapabilities (:classFileContentSupport t))
-                                   )))))
-
-;; https://git.sr.ht/~kennyballou/dotfiles.git/tree/master/item/config/emacs/emacs.d/emacs.org
-
-;;https://github.com/zsxh/emacs.d/blob/master/lisp/init-lang-java.el
-
-(use-package markdown-mode
-  :straight t
-  :ensure t)
-
 (use-package flycheck
   :straight t
   :ensure t
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
-
-(use-package flycheck-eglot
-  :straight t
-  :ensure t
-  :after (flycheck eglot)
-  :config
-  (global-flycheck-eglot-mode 1))
-
-(add-hook 'tsx-ts-mode-hook 'eglot-ensure)
-(add-hook 'typescript-ts-mode-hook 'eglot-ensure)
-(add-hook 'js-ts-mode-hook 'eglot-ensure)
-(add-hook 'java-ts-mode-hook 'eglot-ensure)
-(add-hook 'python-ts-mode-hook 'eglot-ensure)
-(add-hook 'c-ts-mode-hook 'eglot-ensure)
-(add-hook 'c++-ts-mode-hook 'eglot-ensure)
-(add-hook 'rust-ts-mode-hook 'eglot-ensure)
-(require 'eglot)
 
 ;;apheleia
 (use-package apheleia
@@ -152,11 +58,6 @@
 ;;fonts
 (add-to-list 'default-frame-alist
              '(font . "Iosevka-14"))
-
-;;dape
-(use-package dape
-  :straight t)
-
 
 ;;lang
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
@@ -238,11 +139,11 @@
   (nerd-icons-completion-marginalia-setup)
   (nerd-icons-completion-mode 1))
 
-(use-package nerd-icons-corfu
-  :straight t
-  :ensure t
-  :config
-  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+;; (use-package nerd-icons-corfu
+;;   :straight t
+;;   :ensure t
+;;   :config
+;;   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 (use-package nerd-icons-dired
   :straight t
@@ -256,24 +157,15 @@
   :ensure t
   :init
   (doom-modeline-mode 1))
-(straight-use-package
- '(eat :type git
-       :host codeberg
-       :repo "akib/emacs-eat"
-       :files ("*.el" ("term" "term/*.el") "*.texi"
-               "*.ti" ("terminfo/e" "terminfo/e/*")
-               ("terminfo/65" "terminfo/65/*")
-               ("integration" "integration/*")
-               (:exclude ".dir-locals.el" "*-tests.el"))))
 
-;;; Whitespace mode
-(defun rc/set-up-whitespace-handling ()
-  (interactive)
-  (whitespace-mode 1)
-  (add-to-list 'write-file-functions 'delete-trailing-whitespace))
-(setq whitespace-style  '(face tabs spaces trailing space-before-tab newline indentation empty space-after-tab space-mark tab-mark))
-(add-hook 'prog-mode-hook 'rc/set-up-whitespace-handling)
+(use-package lsp-mode
+  :straight t
+  :ensure t
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :commands lsp)
 
-;;(setq whitespace-style '(trailing space-mark))
-
-(load-file "~/.emacs.d/sol.el")
+(use-package lsp-java
+  :straight t
+  :ensure t)
+(add-hook 'java-mode-hook #'lsp)
