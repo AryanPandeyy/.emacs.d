@@ -57,7 +57,7 @@
 
 ;;fonts
 (add-to-list 'default-frame-alist
-             '(font . "Iosevka-14"))
+             '(font . "JetBrains Mono-14"))
 
 ;;lang
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
@@ -101,7 +101,7 @@
 ;; (use-package kanagawa-theme
 ;;   :straight t
 ;;   :ensure t)
-(load-theme 'modus-vivendi t)
+(load-theme 'modus-operandi t)
 
 ;; multiple cursors used by rexim
 (use-package multiple-cursors
@@ -163,9 +163,32 @@
   :ensure t
   :init
   (setq lsp-keymap-prefix "C-c l")
+  :hook ((tsx-ts-mode . lsp)
+         (jsx-ts-mode . lsp)
+         (typescript-ts-mode . lsp)
+         (js-ts-mode . lsp)
+         (solidity-mode . lsp))
   :commands lsp)
 
 (use-package lsp-java
   :straight t
   :ensure t)
-(add-hook 'java-mode-hook #'lsp)
+(add-hook 'java-ts-mode-hook #'lsp)
+
+(use-package lsp-treemacs
+  :straight t
+  :ensure t)
+
+(use-package dap-mode
+  :straight t
+  :ensure t)
+
+(use-package spacious-padding
+  :straight t
+  :ensure t
+  :config
+  (spacious-padding-mode 1))
+
+(use-package solidity-mode
+  :straight t
+  :ensure t)
