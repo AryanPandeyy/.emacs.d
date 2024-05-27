@@ -30,7 +30,9 @@
 (setq-default inhibit-startup-screen t)
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
+(set-frame-parameter nil 'alpha-background 70)
 
+(add-to-list 'default-frame-alist '(alpha-background . 70))
 ;; Tab and Space
 ;; Permanently indent with spaces, never with TABs
 ;; M-^ delete-indentation
@@ -97,10 +99,9 @@
   (setq vertico-resize t)
   (setq vertico-cycle t))
 
-;; kanagawa theme
-;; (use-package kanagawa-theme
-;;   :straight t
-;;   :ensure t)
+(use-package ef-themes
+  :straight t
+  :ensure t)
 (load-theme 'modus-operandi t)
 
 ;; multiple cursors used by rexim
@@ -139,12 +140,6 @@
   (nerd-icons-completion-marginalia-setup)
   (nerd-icons-completion-mode 1))
 
-;; (use-package nerd-icons-corfu
-;;   :straight t
-;;   :ensure t
-;;   :config
-;;   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
-
 (use-package nerd-icons-dired
   :straight t
   :ensure t
@@ -158,6 +153,16 @@
   :init
   (doom-modeline-mode 1))
 
+(use-package company
+  :straight t
+  :ensure t
+  :config (global-company-mode t))
+(setq gc-cons-threshold (* 100 1024 1024)
+      read-process-output-max (* 1024 1024)
+      treemacs-space-between-root-nodes nil
+      company-idle-delay 0.0
+      company-minimum-prefix-length 1
+      lsp-idle-delay 0.1)  ;; clangd is fast
 (use-package lsp-mode
   :straight t
   :ensure t
@@ -167,7 +172,8 @@
          (jsx-ts-mode . lsp)
          (typescript-ts-mode . lsp)
          (js-ts-mode . lsp)
-         (solidity-mode . lsp))
+         (solidity-mode . lsp)
+         (php-mode . lsp))
   :commands lsp)
 
 (use-package lsp-java
@@ -183,12 +189,16 @@
   :straight t
   :ensure t)
 
-(use-package spacious-padding
-  :straight t
-  :ensure t
-  :config
-  (spacious-padding-mode 1))
+;; (use-package spacious-padding
+;;   :straight t
+;;   :ensure t
+;;   :config
+;;   (spacious-padding-mode 1))
 
 (use-package solidity-mode
+  :straight t
+  :ensure t)
+
+(use-package php-mode
   :straight t
   :ensure t)
