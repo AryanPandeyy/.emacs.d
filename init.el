@@ -173,8 +173,32 @@
          (typescript-ts-mode . lsp)
          (js-ts-mode . lsp)
          (solidity-mode . lsp)
-         (php-mode . lsp))
-  :commands lsp)
+         (php-mode . lsp)
+         (go-ts-mode . lsp)
+         (rust-ts-mode . lsp))
+  :commands lsp
+  :config
+  (setq lsp-auto-guess-root t)
+  (setq lsp-log-io nil)
+  (setq lsp-restart 'auto-restart)
+  (setq lsp-enable-links nil)
+  (setq lsp-enable-symbol-highlighting nil)
+  (setq lsp-enable-on-type-formatting nil)
+  (setq lsp-lens-enable nil)
+  (setq lsp-signature-auto-activate nil)
+  (setq lsp-signature-render-documentation nil)
+  (setq lsp-eldoc-enable-hover nil)
+  (setq lsp-eldoc-hook nil)
+  (setq lsp-modeline-code-actions-enable nil)
+  (setq lsp-modeline-diagnostics-enable nil)
+  (setq lsp-headerline-breadcrumb-enable nil)
+  (setq lsp-headerline-breadcrumb-icons-enable nil)
+  (setq lsp-semantic-tokens-enable nil)
+  (setq lsp-enable-folding nil)
+  (setq lsp-enable-imenu nil)
+  (setq lsp-enable-snippet nil)
+  (setq lsp-enable-file-watchers nil)
+  (setq lsp-keep-workspace-alive nil))
 
 (use-package lsp-java
   :straight t
@@ -202,3 +226,5 @@
 (use-package php-mode
   :straight t
   :ensure t)
+
+(add-to-list 'apheleia-formatters '(rustfmt . ("rustfmt" "--quiet" "--emit" "stdout" "--edition" "2021")))
