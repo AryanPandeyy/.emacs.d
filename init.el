@@ -35,16 +35,40 @@
 (add-to-list 'auto-mode-alist '("\\.cpp\\'" . c++-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
-
+(add-to-list 'auto-mode-alist '("\\.html\\'" . html-ts-mode))
 
 (setq gc-cons-threshold (* 100 1024 1024)
       read-process-output-max (* 1024 1024))
 
-(add-hook 'rust-ts-mode-hook 'eglot-ensure)
-(add-hook 'c++-ts-mode-hook 'eglot-ensure)
-(add-hook 'c-ts-mode-hook 'eglot-ensure)
-(with-eval-after-load 'eglot
-  (add-to-list 'eglot-server-programs
-               `(java-ts-mode . ("/usr/share/java/jdtls/bin/jdtls"
-                                 "-data"
-                                 "/home/ap/.emacs.d/.cache/lsp/jdtls"))))
+;; (add-hook 'rust-ts-mode-hook 'eglot-ensure)
+;; (add-hook 'c++-ts-mode-hook 'eglot-ensure)
+;; (add-hook 'c-ts-mode-hook 'eglot-ensure)
+;; (add-hook 'typescript-ts-mode-hook 'eglot-ensure)
+;; (add-hook 'js-ts-mode-hook 'eglot-ensure)
+;; (add-hook 'html-ts-mode-hook 'eglot-ensure)
+;; (with-eval-after-load 'eglot
+;;   (add-to-list 'eglot-server-programs
+;;                `(java-ts-mode . ("/usr/share/java/jdtls/bin/jdtls"
+;;                                  "-data"
+;;                                  "/home/ap/.emacs.d/.cache/lsp/jdtls"))))
+
+;; packages
+
+;; magit
+(use-package magit
+  :ensure t)
+
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages '(magit)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
