@@ -20,11 +20,14 @@
 (setq-default c-basic-offset   2
               tab-width        4
               indent-tabs-mode nil)
-(setq java-ts-mode-indent-offset 2)
+;; (setq java-ts-mode-indent-offset 2)
 
 ;;fonts
 (add-to-list 'default-frame-alist
-             '(font . "JetBrains Mono-14"))
+             '(font . "JetBrains Mono-16"))
+
+;; theme
+(load-theme 'modus-vivendi t)
 
 ;;lang
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
@@ -46,29 +49,18 @@
 ;; (add-hook 'typescript-ts-mode-hook 'eglot-ensure)
 ;; (add-hook 'js-ts-mode-hook 'eglot-ensure)
 ;; (add-hook 'html-ts-mode-hook 'eglot-ensure)
+;; (add-hook 'java-ts-mode-hook 'eglot-ensure)
 ;; (with-eval-after-load 'eglot
 ;;   (add-to-list 'eglot-server-programs
-;;                `(java-ts-mode . ("/usr/share/java/jdtls/bin/jdtls"
+;;                `(java-ts-mode . ("//home/ap/.local/src/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/bin/jdtls"
+;;                                  "--jvm-arg=-javaagent:/home/ap/.local/src/eclipse.jdt.ls/lombok.jar"
 ;;                                  "-data"
 ;;                                  "/home/ap/.emacs.d/.cache/lsp/jdtls"))))
-
 ;; packages
 
 ;; magit
 (use-package magit
   :ensure t)
 
-
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages '(magit)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(use-package ef-themes
+  :ensure t)
