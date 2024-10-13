@@ -98,9 +98,22 @@
         notmuch-hello-insert-alltags)
       notmuch-show-all-tags-list t)
 (setq message-kill-buffer-on-exit t)
-(setq notmuch-delete-tags '("+trash" "-inbox" "-unread" "-new"))
+(setq notmuch-message-deleted-tags '("+trash" "-inbox" "-unread" "-new"))
 (setq sendmail-program "gmi")
 (setq send-mail-function 'sendmail-send-it)
 (setq message-sendmail-extra-arguments '("send" "--quiet" "-t" "-C" "~/dox/mail"))
 (setq notmuch-fcc-dirs nil)
 
+(defun jab/notmuch-search-message-delete (go-next)
+  "Delete message and select GO-NEXT message."
+  (notmuch-search-tag notmuch-message-deleted-tags)
+  (if (eq 'up go-next)
+      (notmuch-search-previous-thread)
+    (notmuch-search-next-thread)))
+
+(defun jab/notmuch-search-message-delete-down ()
+  "Delete a message and select the next message."
+  (interactive)
+  (jab/notmuch-search-message-delete 'down))
+
+(define-key notmuch-search-mode-map (kbd "D") 'jab/notmuch-search-message-delete-down)
