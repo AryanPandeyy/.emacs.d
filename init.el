@@ -117,3 +117,76 @@
   (jab/notmuch-search-message-delete 'down))
 
 (define-key notmuch-search-mode-map (kbd "D") 'jab/notmuch-search-message-delete-down)
+
+(defun window-split-toggle ()
+  "Toggle between horizontal and vertical split with two windows."
+  (interactive)
+  (if (> (length (window-list)) 2)
+      (error "Can't toggle with more than 2 windows!")
+    (let ((func (if (window-full-height-p)
+                    #'split-window-vertically
+                  #'split-window-horizontally)))
+      (delete-other-windows)
+      (funcall func)
+      (save-selected-window
+        (other-window 1)
+        (switch-to-buffer (other-buffer))))))
+
+(use-package elfeed
+  :ensure t
+  :config
+  (setq elfeed-feeds
+        '(("https://xcancel.com/LifeMathMoney/rss" x)
+          "https://lifemathmoney.com/feed/"
+          ("https://www.youtube.com/feeds/videos.xml?channel_id=UC7YOGHUfC1Tb6E4pudI9STA" yt))))
+(global-set-key (kbd "C-x w") 'elfeed)
+
+(use-package elcord
+  :ensure t)
+
+(use-package notmuch-indicator
+  :ensure t)
+(setq notmuch-indicator-args
+      '((:terms "tag:unread and tag:inbox" :label "U" :label-face success)
+        (:terms "tag:unread and tag:important" :label "P" :label-face warning :counter-face inherit))
+      notmuch-indicator-refresh-count (* 60 3)
+      notmuch-indicator-hide-empty-counters t
+      notmuch-indicator-force-refresh-commands '(notmuch-refresh-this-buffer))
+(notmuch-indicator-mode 1)
+
+(use-package telega
+  :ensure t
+  :commands (telega)
+  :defer t)
+(add-hook 'telega-load-hook 'telega-notifications-mode)
+(setq telega-server-libs-prefix "/usr/")
+(global-set-key (kbd "C-c t") 'telega)
+
+(use-package pdf-tools
+  :ensure t)
+
+(use-package notmuch-notify
+  :load-path "~/.emacs.d/notmuch-notify"
+  :hook (notmuch-hello-refresh . notmuch-notify-hello-refresh-status-message)
+  :config
+  (notmuch-notify-set-refresh-timer))
+
+(use-package alert
+  :ensure t)
+
+(use-package vertico
+  :ensure t
+  :config
+  (setq vertico-cycle t)
+  (setq vertico-resize nil)
+  (vertico-mode 1))
+
+(use-package marginalia
+  :ensure t
+  :config
+  (marginalia-mode 1))
+
+(use-package orderless
+  :ensure t
+  :config
+  (setq completion-styles '(orderless basic)))
