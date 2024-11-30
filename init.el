@@ -97,6 +97,8 @@
       '(notmuch-hello-insert-saved-searches
         notmuch-hello-insert-alltags)
       notmuch-show-all-tags-list t)
+(setq-default notmuch-search-oldest-first nil)
+;; (setq notmuch-search-oldest-first nil)
 (setq message-kill-buffer-on-exit t)
 (setq notmuch-message-deleted-tags '("+trash" "-inbox" "-unread" "-new"))
 (setq sendmail-program "gmi")
@@ -138,55 +140,104 @@
   (setq elfeed-feeds
         '(("https://xcancel.com/LifeMathMoney/rss" x)
           "https://lifemathmoney.com/feed/"
-          ("https://www.youtube.com/feeds/videos.xml?channel_id=UC7YOGHUfC1Tb6E4pudI9STA" yt))))
+          ("https://www.youtube.com/feeds/videos.xml?channel_id=UC7YOGHUfC1Tb6E4pudI9STA" yt)
+          ("http://www.youtube.com/feeds/videos.xml?channel_id=UCyzf9_LUFN-2Xr30z8hyW1A" life)
+          ("https://www.youtube.com/feeds/videos.xml?channel_id=UCngn7SVujlvskHRvRKc1cTw" devs)
+          ("https://www.youtube.com/feeds/videos.xml?channel_id=UC7YOGHUfC1Tb6E4pudI9STA" devs)
+          ("https://www.youtube.com/feeds/videos.xml?channel_id=UC2eYFnH61tmytImy1mTYvhA" devs)
+          ("https://www.youtube.com/feeds/videos.xml?channel_id=UC5KDiSAFxrDWhmysBcNqtMA" devs)
+          ("https://www.youtube.com/feeds/videos.xml?channel_id=UCrqM0Ym_NbK1fqeQG2VIohg" devs)
+          ("https://www.youtube.com/feeds/videos.xml?channel_id=UCyb_ckNk0RIVBz1vW8wNo2Q" devs)
+          ("https://www.youtube.com/feeds/videos.xml?channel_id=UC2Qw36lBG3P6y6KmOu8JHhw" devs)
+          ("https://www.youtube.com/feeds/videos.xml?channel_id=UCqR1s3Jy4bRMN9c5XGLuLOQ" devs)
+          ("https://blog.dornea.nu/feed.xml" blog)
+          ("https://www.neilhenning.dev/index.xml" devs)
+          ("https://pwy.io/feed.xml" devs)
+          )))
 (global-set-key (kbd "C-x w") 'elfeed)
-
-(use-package elcord
-  :ensure t)
-
-(use-package notmuch-indicator
-  :ensure t)
-(setq notmuch-indicator-args
-      '((:terms "tag:unread and tag:inbox" :label "U" :label-face success)
-        (:terms "tag:unread and tag:important" :label "P" :label-face warning :counter-face inherit))
-      notmuch-indicator-refresh-count (* 60 3)
-      notmuch-indicator-hide-empty-counters t
-      notmuch-indicator-force-refresh-commands '(notmuch-refresh-this-buffer))
-(notmuch-indicator-mode 1)
+(defun browse-url-mpv (url &optional new-window)
+    (start-process "mpv" "*mpv*" "mpv" url))
+(setq browse-url-handlers '(("https:\\/\\/www\\.youtube." . browse-url-mpv)
+    ("." . browse-url-firefox)))
 
 (use-package telega
   :ensure t
   :commands (telega)
   :defer t)
 (add-hook 'telega-load-hook 'telega-notifications-mode)
-(setq telega-server-libs-prefix "/usr/")
+(setq telega-server-libs-prefix "~/.emacs.d/td/tdlib/")
 (global-set-key (kbd "C-c t") 'telega)
-
-(use-package pdf-tools
-  :ensure t)
-
-(use-package notmuch-notify
-  :load-path "~/.emacs.d/notmuch-notify"
-  :hook (notmuch-hello-refresh . notmuch-notify-hello-refresh-status-message)
-  :config
-  (notmuch-notify-set-refresh-timer))
-
-(use-package alert
-  :ensure t)
 
 (use-package vertico
   :ensure t
+  :hook (after-init . vertico-mode)
   :config
-  (setq vertico-cycle t)
-  (setq vertico-resize nil)
-  (vertico-mode 1))
+  (setq vertico-cycle t))
 
 (use-package marginalia
   :ensure t
-  :config
-  (marginalia-mode 1))
+  :hook (after-init . marginalia-mode))
 
 (use-package orderless
   :ensure t
   :config
-  (setq completion-styles '(orderless basic)))
+  (setq completion-styles '(orderless basic))
+  (setq completion-category-defaults nil)
+  (setq completion-category-overrride nil))
+
+(use-package markdown-mode
+  :ensure t)
+'(markdown-header-delimiter-face :foreground "#616161" :height 0.9)
+'(markdown-header-face-1 :height 1.8 :foreground "#A3BE8C" :weight extra-bold :inherit markdown-header-face)
+'(markdown-header-face-2 :height 1.4 :foreground "#EBCB8B" :weight extra-bold :inherit markdown-header-face)
+'(markdown-header-face-3 :height 1.2 :foreground "#D08770" :weight extra-bold :inherit markdown-header-face)
+'(markdown-header-face-4 :height 1.15 :foreground "#BF616A" :weight bold :inherit markdown-header-face)
+'(markdown-header-face-5 :height 1.1 :foreground "#b48ead" :weight bold :inherit markdown-header-face)
+'(markdown-header-face-6 :height 1.05 :foreground "#5e81ac" :weight semi-bold :inherit markdown-header-face)
+
+(use-package elcord
+  :ensure t)
+
+(use-package nerd-icons
+  :ensure t)
+
+(use-package nerd-icons-completion
+  :ensure t
+  :after marginalia
+  :config
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+
+(use-package nerd-icons-corfu
+  :ensure t
+  :after corfu
+  :config
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+
+(use-package nerd-icons-dired
+  :ensure t
+  :hook
+  (dired-mode . nerd-icons-dired-mode))
+
+(use-package corfu
+  :ensure t
+  :hook (after-init . global-corfu-mode)
+  :bind (:map corfu-map ("<tab>" . corfu-complete))
+  :config
+  (setq tab-always-indent 'complete)
+  (setq corfu-preview-current nil)
+  (setq corfu-min-width 20)
+
+  (setq corfu-popupinfo-delay '(1.25 . 0.5))
+  (corfu-popupinfo-mode 1))
+
+(use-package dired
+  :ensure nil
+  :commands (dired)
+  :hook
+  ((dired-mode . dired-hide-details-mode)
+   (dired-mode . hl-line-mode))
+  :config
+  (setq dired-recursive-copies 'always)
+  (setq dired-recursive-deletes 'always)
+  (setq delete-by-moving-to-trash t)
+  (setq dired-dwim-target t))
